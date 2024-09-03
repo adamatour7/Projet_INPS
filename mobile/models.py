@@ -5,9 +5,10 @@ from django.core.mail import send_mail
 
 class Employeur(models.Model):
     nom = models.CharField(max_length=255)
+    prenom = models.CharField(max_length=255)
     adresse = models.TextField()
     email = models.EmailField(unique=True)
-    numero_identification = models.CharField(max_length=50, unique=True)
+    numero_identification = models.IntegerField( unique=True)
     date_enregistrement = models.DateField(auto_now_add=True)
     
     def __str__(self):
@@ -16,7 +17,7 @@ class Employeur(models.Model):
 class Employe(models.Model):
     nom = models.CharField(max_length=255)
     prenom = models.CharField(max_length=255)
-    numero_identification = models.CharField(max_length=50, unique=True)
+    numero_identification = models.IntegerField(unique=True)
     employeur = models.ForeignKey(Employeur, on_delete=models.CASCADE, related_name='employes')
 
     def __str__(self):
