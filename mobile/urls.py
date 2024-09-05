@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import CotisationListAPIView, EmployeurCotisationsAPIView
+from .views import RegisterAPIView, MyTokenObtainPairView, MyTokenRefreshView, DeactivateAccountAPIView
+
 # from .views import DemandeCreateAPIView, DeclarationCreateAPIView, TypeDemandeListAPIView
 # from .views import DroitListAPIView, SimulationPensionCreateAPIView
 # from .views import SuiviDemandeAPIView, SuiviDeclarationAPIView
@@ -7,6 +9,12 @@ from .views import CotisationListAPIView, EmployeurCotisationsAPIView
 
 
 urlpatterns = [
+    
+    path('register/', RegisterAPIView.as_view(), name='register'),
+    path('login/', MyTokenObtainPairView.as_view(), name='login'),
+    path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),
+    path('deactivate/', DeactivateAccountAPIView.as_view(), name='deactivate_account'),
+    
     path('employes/<int:employe_id>/cotisations/', CotisationListAPIView.as_view(), name='employe-cotisations'),
     path('employeurs/<int:employeur_id>/cotisations/', EmployeurCotisationsAPIView.as_view(), name='employeur-cotisations'),
     

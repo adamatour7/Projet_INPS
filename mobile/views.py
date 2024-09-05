@@ -17,6 +17,64 @@ class EmployeurCotisationsAPIView(generics.ListAPIView):
         employeur_id = self.kwargs['employeur_id']
         return Cotisation.objects.filter(employe__employeur__id=employeur_id).order_by('-periode_debut')
 
+###########################################################
+#Création de compte
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'password2', 'email')
+
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError({"password": "Les mots de passe ne correspondent pas"})
+        return data
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data['email']
+        )
+        return user
+
+class RegisterAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+## Connexion
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    pass
+
+class MyTokenRefreshView(TokenRefreshView):
+    pass
+
+## Desactiver le compte
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+class DeactivateAccountAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user.is_active = False
+        user.save()
+        return Response({"detail": "Compte désactivé"}, status=status.HTTP_204_NO_CONTENT)
+
 ####Gestion des demandes et déclarations
 
 # from rest_framework import generics
